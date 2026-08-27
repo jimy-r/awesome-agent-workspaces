@@ -4,9 +4,9 @@ name: Awesome lint
 # touches markdown, so entry format, badge, table of contents and heading rules
 # are enforced mechanically rather than by review memory.
 #
-# Note on `awesome-git-repo-age`: awesome-lint refuses to pass a repository
-# younger than 30 days. That rule is about eligibility for the official awesome
-# index, not about the list's contents, and it clears on its own with time.
+# fetch-depth: 0 because several awesome-lint rules shell out to git (they
+# resolve the origin remote through the current branch's tracking config), and
+# a shallow checkout makes them report the repo as invalid rather than lint it.
 
 on:
   pull_request:
@@ -22,10 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
 
       - name: Run awesome-lint
+        # Lowercase name is the variable awesome-lint actually reads; without it
+        # its GitHub API checks run unauthenticated and can hit rate limits.
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: npx --yes awesome-lint

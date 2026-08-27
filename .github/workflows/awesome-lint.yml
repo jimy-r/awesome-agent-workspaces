@@ -1,0 +1,31 @@
+name: Awesome lint
+
+# Runs the awesome manifest linter over README.md on every pull request that
+# touches markdown, so entry format, badge, table of contents and heading rules
+# are enforced mechanically rather than by review memory.
+#
+# Note on `awesome-git-repo-age`: awesome-lint refuses to pass a repository
+# younger than 30 days. That rule is about eligibility for the official awesome
+# index, not about the list's contents, and it clears on its own with time.
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  awesome-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Run awesome-lint
+        run: npx --yes awesome-lint

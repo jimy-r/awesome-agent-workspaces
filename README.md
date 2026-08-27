@@ -2,13 +2,13 @@
 
 > Tools, patterns and resources for agent workspaces that survive past a single session.
 
-Most agent tooling is about capability: making the agent smarter, faster, more autonomous. This list is about the other half, the part that decides whether any of that capability is still there tomorrow. Persistent memory, context management, evaluation, guardrails, orchestration discipline, observability, security. The scaffolding that turns a chat window into a workspace you can hand work to and come back to.
+Most agent tooling chases capability. Smarter agents, faster agents, agents that need less supervision. This list is about the other half, the part that decides whether any of that capability is still there tomorrow. Persistent memory, context management, evaluation, guardrails, orchestration discipline, observability, security. The scaffolding that turns a chat window into a workspace you can hand work to and come back to.
 
 **In scope:** memory systems an agent reads and writes across sessions, context management and compaction, evaluation and benchmarks aimed at agents rather than raw model output, hooks and guardrails, orchestration and delegation discipline, skills and instruction-file management, observability and telemetry, security and permissions, and reference architectures that show a whole working setup.
 
 **Out of scope:** generic agent frameworks, prompt collections, model lists, and one-shot demos. Those are well covered elsewhere and they are not what breaks when a workspace has to last.
 
-**The bar.** Every entry clears three tests. It is *maintained*, meaning real activity within roughly the last twelve months. It is *documented*, meaning a reader can tell what it does, and how it differs from the entry above it, without cloning it. And it is genuinely about *workspace durability* rather than agent capability. Every entry earns its place; the list is deliberately small, and it will stay small. Rejected submissions are recorded in [REJECTIONS.md](REJECTIONS.md) with a reason, because the bar is the product.
+**The bar.** Every entry clears three tests. It is *maintained*, meaning real activity within roughly the last twelve months. It is *documented*, meaning a reader can tell what it does, and how it differs from the entry above it, without cloning it. And it is genuinely about *workspace durability* rather than agent capability. Every entry earns its place. The list is deliberately small, and it will stay small. Rejected submissions are recorded in [REJECTIONS.md](REJECTIONS.md) with a reason, because the bar is the product.
 
 ## Contents
 

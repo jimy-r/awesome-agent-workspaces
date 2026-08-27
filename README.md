@@ -22,7 +22,6 @@ Most agent tooling is about capability: making the agent smarter, faster, more a
 - [Security and permissions](#security-and-permissions)
 - [Reference architectures](#reference-architectures)
 - [Learning resources](#learning-resources)
-- [Contributing](#contributing)
 
 ## Memory systems
 
@@ -48,6 +47,7 @@ Most agent tooling is about capability: making the agent smarter, faster, more a
 ## Hooks and guardrails
 
 - [Claude Code Hooks Mastery](https://github.com/disler/claude-code-hooks-mastery) - Worked examples of every Claude Code hook event, which is the gap between having read the hook docs and knowing what actually fires when.
+- [cc-safety-net](https://github.com/kenryu42/cc-safety-net) - A hook that blocks destructive Git and filesystem commands and secret-file reads before they execute, across a dozen agent CLIs.
 - [Guardrails](https://github.com/guardrails-ai/guardrails) - Wraps model input and output in validators that can block, retry or repair a response before it reaches anything downstream.
 - [NeMo Guardrails](https://github.com/NVIDIA-NeMo/Guardrails) - Expresses conversational policy as programmable rails, so the constraint lives in a reviewable file instead of buried in prompt text.
 
@@ -64,6 +64,7 @@ Most agent tooling is about capability: making the agent smarter, faster, more a
 - [AGENTS.md](https://github.com/agentsmd/agents.md) - One open, predictable filename for the project instructions every coding agent reads, instead of a different dotfile for each vendor.
 - [Agent Skills](https://github.com/anthropics/skills) - The Skills format plus reference implementations, which packages a procedure as a loadable file rather than another paragraph of prompt.
 - [Superpowers](https://github.com/obra/superpowers) - Composable skills shipped with the bootstrap instructions that make an agent actually reach for them, across a dozen different agent CLIs.
+- [agnix](https://github.com/agent-sh/agnix) - A linter and language server for the instruction layer itself, validating CLAUDE.md, AGENTS.md, SKILL.md, hook definitions and MCP config.
 
 ## Observability and telemetry
 
@@ -75,15 +76,14 @@ Most agent tooling is about capability: making the agent smarter, faster, more a
 ## Security and permissions
 
 - [Snyk Agent Scan](https://github.com/snyk/agent-scan) - Discovers the agents, MCP servers and skills installed on a machine and scans them for prompt injection and known vulnerabilities.
+- [SkillSpector](https://github.com/NVIDIA/SkillSpector) - Inspects agent skills for malicious patterns, prompt injection and data-exfiltration paths before you install them, not after.
 - [Claude Code Security Review](https://github.com/anthropics/claude-code-security-review) - A GitHub Action that reviews a pull request's diff for security problems, scoped to what actually changed.
-- [PurpleLlama](https://github.com/meta-llama/PurpleLlama) - Benchmarks and input/output classifiers for measuring an LLM system's security posture instead of asserting it.
 
 ## Reference architectures
 
 - [agent-workspace-architecture](https://github.com/jimy-r/agent-workspace-architecture) - A redacted snapshot of one working agent workspace: roles library, typed memory, hooks, scheduled agents, delegation queue, self-audits and token budgeting *(maintained by the list author)*.
 - [LifeOS](https://github.com/danielmiessler/LifeOS) - An opinionated personal harness built around durable context about its operator, published with its documentation and install path rather than described in a talk.
 - [GBrain](https://github.com/garrytan/gbrain) - The memory and retrieval layer behind one operator's production agent fleet, including overnight consolidation and citation repair.
-- [Hermes Agent](https://github.com/NousResearch/hermes-agent) - An agent whose headline feature is persistence: it writes skills from its own experience, searches past sessions and runs somewhere other than your laptop.
 
 ## Learning resources
 
@@ -94,7 +94,7 @@ Most agent tooling is about capability: making the agent smarter, faster, more a
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) first. One pull request per entry, and the three tests above decide it. Self-submissions are welcome and held to the same bar. Every rejection gets a one-line reason in [REJECTIONS.md](REJECTIONS.md).
+Read [CONTRIBUTING.md](CONTRIBUTING.md) first. One pull request per entry, and the three tests above decide it. Self-submissions are welcome and held to the same bar. Every rejection gets a one-line reason in the rejection log.
 
 All entries verified 2026-08-27. Dead links and inactive projects are pruned by CI and by review.
 

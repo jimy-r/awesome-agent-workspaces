@@ -10,6 +10,8 @@ Most agent tooling chases capability. Smarter agents, faster agents, agents that
 
 **The bar.** Every entry clears three tests. It is *maintained*, meaning real activity within roughly the last twelve months. It is *documented*, meaning a reader can tell what it does, and how it differs from the entry above it, without cloning it. And it is genuinely about *workspace durability* rather than agent capability. Every entry earns its place. The list is deliberately small, and it will stay small. Rejected submissions are recorded in [REJECTIONS.md](REJECTIONS.md) with a reason, because the bar is the product.
 
+A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py)) flags any entry quieter than 90 days as a signal to review, well before it would actually cross the twelve-month bar above.
+
 ## Contents
 
 - [Memory systems](#memory-systems)

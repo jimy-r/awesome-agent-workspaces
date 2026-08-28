@@ -1,0 +1,43 @@
+name: Maintained check
+
+# Mechanised early-warning for the README's "maintained" bar (roughly twelve
+# months, judged by hand at review time). Flags anything quieter than 90
+# days so staleness surfaces for review well before an entry actually
+# crosses that bar -- see scripts/check_maintained.py for the threshold and
+# why it is deliberately not the bar itself.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1' # Monday 07:00 UTC, an hour after the link check
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check each entry's last push date
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/check_maintained.py | tee maintained-report.txt
+          if grep -qE "^(STALE|UNREACHABLE)" maintained-report.txt; then
+            echo "found_stale=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found_stale=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open issue when an entry has gone quiet
+        if: steps.check.outputs.found_stale == 'true'
+        uses: peter-evans/create-issue-from-file@v6
+        with:
+          title: 'Maintained-bar check: entries to review'
+          content-filepath: ./maintained-report.txt
+          labels: |
+            maintenance

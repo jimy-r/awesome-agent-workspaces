@@ -93,6 +93,8 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 - [Awesome Context Engineering](https://github.com/Meirtz/Awesome-Context-Engineering) - A survey of context engineering across papers, frameworks and implementation guides.
 - [Awesome Agentic Patterns](https://github.com/nibzard/awesome-agentic-patterns) - A catalogue of recurring agentic patterns, named and described closely enough to argue about.
 - [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code) - The broad resource list for Claude Code, useful as the wide net this list is deliberately not.
+- [Agent workspace learn track](https://github.com/jimy-r/agent-workspace-architecture/tree/main/learn) - A guided seven-module track through the reference workspace's patterns, organised by capability, one exercise with a done-check per module *(maintained by the list author)*.
+- [Governed workspace tutorial](https://github.com/jimy-r/agent-workspace-starter/blob/main/docs/tutorial.md) - Stand up a working governed workspace in seven checked steps from the starter template *(maintained by the list author)*.
 
 ## Contributing
 

@@ -11,13 +11,15 @@ on:
     - cron: '0 7 * * 1' # Monday 07:00 UTC, an hour after the link check
   workflow_dispatch:
 
-permissions:
-  contents: read
-  issues: write
-
 jobs:
   check:
     runs-on: ubuntu-latest
+    # Scoped to this job only (not the workflow) so no other job in this
+    # file inherits write access. contents: write is needed only by the
+    # restamp step below; the check step itself only reads.
+    permissions:
+      contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v7
 
@@ -41,3 +43,21 @@ jobs:
           content-filepath: ./maintained-report.txt
           labels: |
             maintenance
+
+      - name: Restamp README verified-on date
+        # Only when this run found zero breaches -- a stamp written while
+        # entries are stale would assert a verification that didn't happen.
+        # See the "Open issue" step above: the two are mutually exclusive.
+        if: steps.check.outputs.found_stale == 'false'
+        run: |
+          today="$(date -u +%Y-%m-%d)"
+          sed -i -E "s/^All entries verified [0-9]{4}-[0-9]{2}-[0-9]{2}\./All entries verified ${today}./" README.md
+          if git diff --quiet -- README.md; then
+            echo "README.md already stamped ${today}; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Restamp verified-on date to ${today} [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}

@@ -6,7 +6,7 @@ Disagreeing with a rejection is fine and the log exists so you can. Doing it by 
 
 ## Reporting
 
-Conduct concerns go to the maintainer's [moderation report form](https://github.com/jimy-r/agent-workspace-architecture/issues/new?template=moderation_report.yml), which covers this list along with the maintainer's other repositories. That form opens a public issue, which suits reports about behaviour that already happened in public.
+Conduct concerns go to the maintainer's [moderation report form](https://github.com/jimy-r/agent-workspace-architecture/issues/new?template=moderation_report.yml), which covers this list along with the maintainer's other repositories. It opens a public issue. That suits a report about behaviour that already happened in public, where the record is most of the point.
 
 If a report needs to stay out of public view, or the concern is about the maintainer, use GitHub's own [report abuse](https://github.com/contact/report-abuse) route instead. No private address is published here and none is needed.
 

@@ -98,7 +98,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) first. One pull request per entry, and the three tests above decide it. Self-submissions are welcome and held to the same bar. Every rejection gets a one-line reason in the rejection log.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) first. One pull request per entry, and the three tests above decide it. Self-submissions are welcome and held to the same bar. Every rejection gets a one-line reason in the rejection log. Taking part means following the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 All entries verified 2026-08-27. Dead links and inactive projects are pruned by CI and by review.
 

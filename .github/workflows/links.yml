@@ -65,6 +65,12 @@ jobs:
             --max-concurrency 4
             ${{ steps.changed.outputs.files }}
           fail: true
+          # A PR can legitimately change a .md file that contains no links at
+          # all. lychee treats an empty run as a misconfiguration and fails by
+          # default, which failed PR #4 on a REJECTIONS.md edit. Only the
+          # diff-scoped run can be empty for a good reason, so the relaxation
+          # stays here; an empty full-repo sweep below really is a config error.
+          failIfEmpty: false
 
       - name: Run lychee (scheduled / manual — full repo)
         id: lychee_full

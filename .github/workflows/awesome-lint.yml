@@ -14,8 +14,8 @@ on:
     paths:
       - '**/*.md'
   pull_request:
-    paths:
-      - '**/*.md'
+    # No paths filter: awesome-lint is a required check under branch protection,
+    # so it must report on every PR, including ones that touch no markdown.
   workflow_dispatch:
 
 permissions:

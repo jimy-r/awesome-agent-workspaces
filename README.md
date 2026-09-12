@@ -100,6 +100,6 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) first. One pull request per entry, and the three tests above decide it. Self-submissions are welcome and held to the same bar. Every rejection gets a one-line reason in the rejection log. Taking part means following the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Every entry checked against the maintained bar 2026-08-27. That check runs weekly: it reads each entry's last push date, opens a review issue for anything quieter than 90 days, and only refreshes the date in this sentence once nothing has crossed the twelve-month bar. Dead links and inactive projects are pruned by CI and by review.
+Every entry checked against the maintained bar 2026-09-13. That check runs weekly: it reads each entry's last push date, opens a review issue for anything quieter than 90 days, and only refreshes the date in this sentence once nothing has crossed the twelve-month bar. Dead links and inactive projects are pruned by CI and by review.
 
 To the extent possible under law, the maintainer has waived all copyright and related or neighboring rights to this work under [CC0 1.0](LICENSE).

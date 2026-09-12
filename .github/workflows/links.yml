@@ -52,7 +52,7 @@ jobs:
       - name: Run lychee (PR — diff only)
         id: lychee_pr
         if: github.event_name == 'pull_request' && steps.changed.outputs.any_changed == 'true'
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2
         env:
           # Lets lychee use the GitHub API for github.com links instead of
           # scraping them, which avoids anonymous rate limiting on a list
@@ -75,7 +75,7 @@ jobs:
       - name: Run lychee (scheduled / manual — full repo)
         id: lychee_full
         if: github.event_name != 'pull_request'
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -109,7 +109,7 @@ jobs:
 
       - name: Open or refresh the issue on scheduled failure
         if: github.event_name == 'schedule' && steps.lychee_full.outputs.exit_code != '0'
-        uses: peter-evans/create-issue-from-file@v6
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           # Empty when the lookup found nothing, which makes the action open a
           # fresh issue. Passing it is what stops each weekly run filing a

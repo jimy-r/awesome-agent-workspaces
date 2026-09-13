@@ -45,6 +45,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 - [promptfoo](https://github.com/promptfoo/promptfoo) - Runs declarative prompt and agent test suites in CI, and turns the same targets into a red-teaming harness.
 - [SWE-bench](https://github.com/SWE-bench/SWE-bench) - Scores agents on resolving real GitHub issues, using each repository's own test suite as the grader.
 - [Harbor](https://github.com/harbor-framework/harbor) - Evaluates entire agent harnesses such as Claude Code and Codex CLI, not just the model underneath, across thousands of parallel sandboxes.
+- [YYLO Benchmark](https://github.com/yylo-dev/yylo-benchmark) - Evaluates agent runs in private fresh-repository attempt workspaces and retains immutable evidence, with blinded per-step judging for governed workflows.
 
 ## Hooks and guardrails
 

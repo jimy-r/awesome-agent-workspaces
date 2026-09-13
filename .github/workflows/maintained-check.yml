@@ -1,10 +1,14 @@
 name: Maintained check
 
-# Mechanised early-warning for the README's "maintained" bar (roughly twelve
-# months, judged by hand at review time). Flags anything quieter than 90
-# days so staleness surfaces for review well before an entry actually
-# crosses that bar -- see scripts/check_maintained.py for the threshold and
-# why it is deliberately not the bar itself.
+# Mechanised watch on the README's "maintained" bar. The check reports two
+# markers: STALE at 90 days (early warning, worth a look) and BREACH at 365
+# days or UNREACHABLE (the bar itself crossed, judged by hand at review time).
+# See scripts/check_maintained.py for why they are separate.
+#
+# The review issue is filed on either marker. The README restamp fires only
+# when nothing has breached, because a healthy curated list always has some
+# entries in the 90-day band and gating the restamp on that band meant it
+# could never fire at all.
 
 on:
   schedule:
@@ -33,7 +37,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 scripts/check_maintained.py | tee maintained-report.txt
-          if grep -qE "^(STALE|UNREACHABLE)" maintained-report.txt; then
+          if grep -qE "^(BREACH|UNREACHABLE)" maintained-report.txt; then
+            echo "found_breach=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found_breach=false" >> "$GITHUB_OUTPUT"
+          fi
+          if grep -qE "^STALE" maintained-report.txt; then
             echo "found_stale=true" >> "$GITHUB_OUTPUT"
           else
             echo "found_stale=false" >> "$GITHUB_OUTPUT"
@@ -41,7 +50,7 @@ jobs:
 
       - name: Find the standing maintained-bar issue
         id: standing
-        if: steps.check.outputs.found_stale == 'true'
+        if: steps.check.outputs.found_stale == 'true' || steps.check.outputs.found_breach == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -57,8 +66,8 @@ jobs:
           echo "number=${number}" >> "$GITHUB_OUTPUT"
 
       - name: Open or refresh the issue when an entry has gone quiet
-        if: steps.check.outputs.found_stale == 'true'
-        uses: peter-evans/create-issue-from-file@v6
+        if: steps.check.outputs.found_stale == 'true' || steps.check.outputs.found_breach == 'true'
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           # Empty when the lookup found nothing, which makes the action open a
           # fresh issue. Passing it is what stops each weekly run filing a
@@ -70,13 +79,13 @@ jobs:
             maintenance
 
       - name: Restamp README verified-on date
-        # Only when this run found zero breaches -- a stamp written while
-        # entries are stale would assert a verification that didn't happen.
-        # See the "Open issue" step above: the two are mutually exclusive.
-        if: steps.check.outputs.found_stale == 'false'
+        # Only when this run found zero breaches. Entries sitting in the
+        # 90-day STALE band do not block it; the sentence the stamp writes
+        # claims exactly what this check proved, and no more.
+        if: steps.check.outputs.found_breach == 'false'
         run: |
           today="$(date -u +%Y-%m-%d)"
-          sed -i -E "s/^All entries verified [0-9]{4}-[0-9]{2}-[0-9]{2}\./All entries verified ${today}./" README.md
+          sed -i -E "s|^Every entry checked against the maintained bar [0-9]{4}-[0-9]{2}-[0-9]{2}\.|Every entry checked against the maintained bar ${today}.|" README.md
           if git diff --quiet -- README.md; then
             echo "README.md already stamped ${today}; nothing to commit."
             exit 0

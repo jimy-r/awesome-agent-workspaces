@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 """Flag README entries whose upstream repo has gone quiet.
 
-The "maintained" bar in README.md's inclusion criteria is a human judgment
-call: real activity within roughly the last twelve months. This script is
-an earlier-warning signal, not the bar itself -- it flags any GitHub entry
-with no push in more than STALE_DAYS days, well before a year passes, so
-staleness surfaces for review rather than being caught only once an entry
-has already crossed the twelve-month line.
+Two thresholds, reported as two distinct markers, because they answer two
+different questions.
+
+STALE (90 days) is the early-warning signal: worth a look, not yet a
+problem. A healthy curated list has entries in this band at all times.
+
+BREACH (365 days), plus UNREACHABLE, is the "maintained" bar from README.md's
+inclusion criteria actually being crossed: roughly twelve months with no real
+activity, judged by hand at review time. The final call stays human; this is
+the machine saying which entries the human has to look at.
+
+Keeping them apart is what lets the workflow gate two things separately: it
+files the review issue on either marker, and it restamps the README's
+verified-on date only when nothing has breached. Under one combined flag the
+restamp could never fire, because the 90-day band is never empty.
 
 Usage:
     python scripts/check_maintained.py            # human-readable report
@@ -26,6 +35,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 README = REPO / "README.md"
 STALE_DAYS = 90
+BREACH_DAYS = 365
 
 ENTRY_RE = re.compile(r"^-\s+\[([^\]]+)\]\(https://github\.com/([^/]+)/([^/)]+)\)")
 
@@ -60,6 +70,7 @@ def main() -> int:
     entries = find_entries()
     now = datetime.now(timezone.utc)
     stale: list[tuple[str, str, str, int]] = []
+    breached: list[tuple[str, str, str, int]] = []
     unreachable: list[str] = []
 
     for name, owner, repo in entries:
@@ -71,7 +82,9 @@ def main() -> int:
             tzinfo=timezone.utc
         )
         age_days = (now - pushed).days
-        if age_days > STALE_DAYS:
+        if age_days > BREACH_DAYS:
+            breached.append((name, owner, repo, age_days))
+        elif age_days > STALE_DAYS:
             stale.append((name, owner, repo, age_days))
 
     if args.json:
@@ -80,29 +93,44 @@ def main() -> int:
                 {
                     "checked": len(entries),
                     "stale_days_threshold": STALE_DAYS,
+                    "breach_days_threshold": BREACH_DAYS,
                     "stale": [
                         {"name": n, "owner": o, "repo": r, "days_since_push": d}
                         for n, o, r, d in stale
+                    ],
+                    "breached": [
+                        {"name": n, "owner": o, "repo": r, "days_since_push": d}
+                        for n, o, r, d in breached
                     ],
                     "unreachable": unreachable,
                 }
             )
         )
     else:
-        if not stale and not unreachable:
+        if not stale and not breached and not unreachable:
             print(
                 f"All {len(entries)} entries pushed within the last {STALE_DAYS} days."
             )
+        elif not breached and not unreachable:
+            print(
+                f"No entry has breached the {BREACH_DAYS}-day maintained bar. "
+                f"{len(stale)} of {len(entries)} are quieter than {STALE_DAYS} days "
+                "and worth a look."
+            )
+        for name, owner, repo, age_days in sorted(breached, key=lambda x: -x[3]):
+            print(
+                f"BREACH ({age_days}d since last push, bar is {BREACH_DAYS}d): "
+                f"{name} -- https://github.com/{owner}/{repo}"
+            )
+        for u in unreachable:
+            print(f"UNREACHABLE (api call failed): {u}")
         for name, owner, repo, age_days in sorted(stale, key=lambda x: -x[3]):
             print(
                 f"STALE ({age_days}d since last push): {name} -- https://github.com/{owner}/{repo}"
             )
-        for u in unreachable:
-            print(f"UNREACHABLE (api call failed): {u}")
 
-    # Advisory only: crossing 90 days is a "keep an eye on it" signal, not
-    # the maintained bar itself (~365 days, judged by hand at review time).
-    # Exit 0 regardless; the workflow step decides whether to open an issue.
+    # Advisory only, both markers. Exit 0 regardless; the workflow step reads
+    # the markers and decides what to file and whether to restamp.
     return 0
 
 

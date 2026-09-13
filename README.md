@@ -10,7 +10,7 @@ Most agent tooling chases capability. Smarter agents, faster agents, agents that
 
 **The bar.** Every entry clears three tests. It is *maintained*, meaning real activity within roughly the last twelve months. It is *documented*, meaning a reader can tell what it does, and how it differs from the entry above it, without cloning it. And it is genuinely about *workspace durability* rather than agent capability. Every entry earns its place. The list is deliberately small, and it will stay small. Rejected submissions are recorded in [REJECTIONS.md](REJECTIONS.md) with a reason, because the bar is the product.
 
-A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py)) flags any entry quieter than 90 days as a signal to review, well before it would actually cross the twelve-month bar above.
+A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py)) reads every entry's last push date. It flags anything quieter than 90 days as a signal to review, well before that entry would cross the twelve-month bar above, and reports a breach separately once one actually does.
 
 ## Contents
 
@@ -101,6 +101,6 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) first. One pull request per entry, and the three tests above decide it. Self-submissions are welcome and held to the same bar. Every rejection gets a one-line reason in the rejection log. Taking part means following the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-All entries verified 2026-08-27. Dead links and inactive projects are pruned by CI and by review.
+Every entry checked against the maintained bar 2026-09-13. That check runs weekly: it reads each entry's last push date, opens a review issue for anything quieter than 90 days, and only refreshes the date in this sentence once nothing has crossed the twelve-month bar. Dead links and inactive projects are pruned by CI and by review.
 
 To the extent possible under law, the maintainer has waived all copyright and related or neighboring rights to this work under [CC0 1.0](LICENSE).

@@ -63,6 +63,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 - [AI-DLC Workflows](https://github.com/awslabs/aidlc-workflows) - Steering rules that break an agent's development work into verifiable, self-correcting stages with human checkpoints between them.
 - [YYLO](https://github.com/yylo-dev/yylo) - Command-line orchestrator that runs each coding-agent task in a dedicated branch/worktree behind typed task, validation, merge, and release-readiness boundaries, with the merge queue owning risk-based review of receipt-backed repository changes.
 - [MulmoTerminal](https://github.com/receptron/mulmoterminal) - Browser grid of live Claude Code / Codex sessions started with one `npx` command. Each cell is a real PTY with a colour-coded status, tmux-backed persistence, and a git worktree per cell. For Claude Code, needs-you is shown separately from done, read from the CLI's own hooks.
+- [Orkas](https://github.com/Orkas-AI/Orkas) - Open-source, local-first desktop AI workforce whose Commander coordinates specialists while each agent keeps private skills and memory across tasks.
 
 ## Skills and instruction management
 

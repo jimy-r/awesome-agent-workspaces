@@ -5,10 +5,10 @@ name: Maintained check
 # days or UNREACHABLE (the bar itself crossed, judged by hand at review time).
 # See scripts/check_maintained.py for why they are separate.
 #
-# The review issue is filed on either marker. The run date and result are
-# written to the job summary; nothing is pushed back to the repo. main is
-# branch-protected with admin enforcement on, and a bot push here was
-# refused on 2026-09-14 and 2026-09-21.
+# Every run's report -- clean or not -- refreshes the standing review issue's
+# body, and is also written to the job summary. Nothing is pushed back to the
+# repo: main is branch-protected with admin enforcement on, and a bot push
+# here was refused on 2026-09-14 and 2026-09-21.
 
 on:
   schedule:
@@ -57,7 +57,6 @@ jobs:
 
       - name: Find the standing maintained-bar issue
         id: standing
-        if: steps.check.outputs.found_stale == 'true' || steps.check.outputs.found_breach == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -72,13 +71,14 @@ jobs:
           fi
           echo "number=${number}" >> "$GITHUB_OUTPUT"
 
-      - name: Open or refresh the issue when an entry has gone quiet
-        if: steps.check.outputs.found_stale == 'true' || steps.check.outputs.found_breach == 'true'
+      - name: Report this run's result to the standing issue
         uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           # Empty when the lookup found nothing, which makes the action open a
           # fresh issue. Passing it is what stops each weekly run filing a
-          # duplicate of the one already open.
+          # duplicate of the one already open. Runs every time now, clean or
+          # not, since this issue is the only durable report once the
+          # restamp-and-push step is gone.
           issue-number: ${{ steps.standing.outputs.number }}
           title: ${{ env.ISSUE_TITLE }}
           content-filepath: ./maintained-report.txt

@@ -6,7 +6,7 @@ Thanks for taking the list seriously enough to propose a change. The bar below i
 
 Every entry has to clear all three.
 
-1. **Maintained.** Real activity within roughly the last twelve months. A repo whose last commit is two years old fails, however good the idea was.
+1. **Maintained.** Real activity within roughly the last twelve months. A repo whose last commit is two years old fails, however good the idea was. A reference text, an essay or a specification whose value doesn't depend on further commits, can be exempted from this bar with a recorded reason in the `EXEMPTIONS` dict in [`scripts/check_maintained.py`](scripts/check_maintained.py). It still has to clear the other two criteria.
 2. **Documented.** A reader can tell what it does, and how it differs from the neighbouring entry, without cloning it and running it. A README that is a logo and an install command fails.
 3. **About workspace durability, not agent capability.** The list covers the things that make an agent workspace survive: persistent memory, context management, evaluation, guardrails, orchestration discipline, observability, security. A tool that makes an agent smarter, faster, or more autonomous is out of scope unless durability is the point of it.
 

@@ -17,6 +17,13 @@ files the review issue on either marker, and it restamps the README's
 verified-on date only when nothing has breached. Under one combined flag the
 restamp could never fire, because the 90-day band is never empty.
 
+EXEMPTIONS below carries entries that fail the age heuristic by design: a
+reference essay or specification whose value doesn't depend on ongoing
+commits, not a tool that rots without them. An exempted entry is never
+checked against the push-date thresholds and reports as EXEMPT, never as
+STALE or BREACH. It still has to clear CONTRIBUTING.md's other two criteria;
+this dict only carries the "maintained" one and records why.
+
 Usage:
     python scripts/check_maintained.py            # human-readable report
     python scripts/check_maintained.py --json      # machine-readable
@@ -36,6 +43,16 @@ REPO = Path(__file__).resolve().parent.parent
 README = REPO / "README.md"
 STALE_DAYS = 90
 BREACH_DAYS = 365
+
+# "owner/repo" -> the recorded reason it's exempt from the age check. Add an
+# entry here only for a reference text (an essay or specification) whose
+# content is stable by design, per CONTRIBUTING.md's exemption note. Keep the
+# reason short; it's printed as-is in both report formats.
+EXEMPTIONS: dict[str, str] = {
+    "humanlayer/12-factor-agents": (
+        "reference essay; the content is stable by design, not a tool that rots"
+    ),
+}
 
 ENTRY_RE = re.compile(r"^-\s+\[([^\]]+)\]\(https://github\.com/([^/]+)/([^/)]+)\)")
 
@@ -72,8 +89,13 @@ def main() -> int:
     stale: list[tuple[str, str, str, int]] = []
     breached: list[tuple[str, str, str, int]] = []
     unreachable: list[str] = []
+    exempt: list[tuple[str, str, str, str]] = []
 
     for name, owner, repo in entries:
+        reason = EXEMPTIONS.get(f"{owner}/{repo}")
+        if reason is not None:
+            exempt.append((name, owner, repo, reason))
+            continue
         ts = pushed_at(owner, repo)
         if ts is None:
             unreachable.append(f"{name} ({owner}/{repo})")
@@ -87,11 +109,13 @@ def main() -> int:
         elif age_days > STALE_DAYS:
             stale.append((name, owner, repo, age_days))
 
+    checked = len(entries) - len(exempt)
+
     if args.json:
         print(
             json.dumps(
                 {
-                    "checked": len(entries),
+                    "checked": checked,
                     "stale_days_threshold": STALE_DAYS,
                     "breach_days_threshold": BREACH_DAYS,
                     "stale": [
@@ -103,18 +127,23 @@ def main() -> int:
                         for n, o, r, d in breached
                     ],
                     "unreachable": unreachable,
+                    "exempt": [
+                        {"name": n, "owner": o, "repo": r, "reason": reason}
+                        for n, o, r, reason in exempt
+                    ],
                 }
             )
         )
     else:
         if not stale and not breached and not unreachable:
+            suffix = f" ({len(exempt)} exempt from the age check.)" if exempt else ""
             print(
-                f"All {len(entries)} entries pushed within the last {STALE_DAYS} days."
+                f"All {checked} entries pushed within the last {STALE_DAYS} days.{suffix}"
             )
         elif not breached and not unreachable:
             print(
                 f"No entry has breached the {BREACH_DAYS}-day maintained bar. "
-                f"{len(stale)} of {len(entries)} are quieter than {STALE_DAYS} days "
+                f"{len(stale)} of {checked} are quieter than {STALE_DAYS} days "
                 "and worth a look."
             )
         for name, owner, repo, age_days in sorted(breached, key=lambda x: -x[3]):
@@ -128,6 +157,8 @@ def main() -> int:
             print(
                 f"STALE ({age_days}d since last push): {name} -- https://github.com/{owner}/{repo}"
             )
+        for name, owner, repo, reason in exempt:
+            print(f"EXEMPT ({reason}): {name} -- https://github.com/{owner}/{repo}")
 
     # Advisory only, both markers. Exit 0 regardless; the workflow step reads
     # the markers and decides what to file and whether to restamp.

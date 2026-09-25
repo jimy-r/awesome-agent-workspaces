@@ -5,10 +5,10 @@ name: Maintained check
 # days or UNREACHABLE (the bar itself crossed, judged by hand at review time).
 # See scripts/check_maintained.py for why they are separate.
 #
-# The review issue is filed on either marker. The README restamp fires only
-# when nothing has breached, because a healthy curated list always has some
-# entries in the 90-day band and gating the restamp on that band meant it
-# could never fire at all.
+# Every run's report -- clean or not -- refreshes the standing review issue's
+# body, and is also written to the job summary. Nothing is pushed back to the
+# repo: main is branch-protected with admin enforcement on, and a bot push
+# here was refused on 2026-09-14 and 2026-09-21.
 
 on:
   schedule:
@@ -19,10 +19,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     # Scoped to this job only (not the workflow) so no other job in this
-    # file inherits write access. contents: write is needed only by the
-    # restamp step below; the check step itself only reads.
+    # file inherits write access. Read-only: this job never writes back to
+    # the repo. issues: write is for the review issue below.
     permissions:
-      contents: write
+      contents: read
       issues: write
     env:
       # One title for the standing issue. The lookup below matches on it and
@@ -47,10 +47,16 @@ jobs:
           else
             echo "found_stale=false" >> "$GITHUB_OUTPUT"
           fi
+          {
+            echo "## Maintained-bar check -- $(date -u +%Y-%m-%d)"
+            echo
+            echo '```'
+            cat maintained-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Find the standing maintained-bar issue
         id: standing
-        if: steps.check.outputs.found_stale == 'true' || steps.check.outputs.found_breach == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -65,33 +71,16 @@ jobs:
           fi
           echo "number=${number}" >> "$GITHUB_OUTPUT"
 
-      - name: Open or refresh the issue when an entry has gone quiet
-        if: steps.check.outputs.found_stale == 'true' || steps.check.outputs.found_breach == 'true'
+      - name: Report this run's result to the standing issue
         uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           # Empty when the lookup found nothing, which makes the action open a
           # fresh issue. Passing it is what stops each weekly run filing a
-          # duplicate of the one already open.
+          # duplicate of the one already open. Runs every time now, clean or
+          # not, since this issue is the only durable report once the
+          # restamp-and-push step is gone.
           issue-number: ${{ steps.standing.outputs.number }}
           title: ${{ env.ISSUE_TITLE }}
           content-filepath: ./maintained-report.txt
           labels: |
             maintenance
-
-      - name: Restamp README verified-on date
-        # Only when this run found zero breaches. Entries sitting in the
-        # 90-day STALE band do not block it; the sentence the stamp writes
-        # claims exactly what this check proved, and no more.
-        if: steps.check.outputs.found_breach == 'false'
-        run: |
-          today="$(date -u +%Y-%m-%d)"
-          sed -i -E "s|^Every entry checked against the maintained bar [0-9]{4}-[0-9]{2}-[0-9]{2}\.|Every entry checked against the maintained bar ${today}.|" README.md
-          if git diff --quiet -- README.md; then
-            echo "README.md already stamped ${today}; nothing to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "Restamp verified-on date to ${today} [skip ci]"
-          git push origin HEAD:${{ github.ref_name }}

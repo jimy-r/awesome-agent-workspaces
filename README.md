@@ -70,6 +70,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 - [Agent Skills](https://github.com/anthropics/skills) - The Skills format plus reference implementations, which packages a procedure as a loadable file rather than another paragraph of prompt.
 - [Superpowers](https://github.com/obra/superpowers) - Composable skills shipped with the bootstrap instructions that make an agent actually reach for them, across a dozen different agent CLIs.
 - [agnix](https://github.com/agent-sh/agnix) - A linter and language server for the instruction layer itself, validating CLAUDE.md, AGENTS.md, SKILL.md, hook definitions and MCP config.
+- [Reef](https://github.com/Human-Agent-Society/reef) - Keeps an agent's rules, skills and prompts as a versioned artifact, replacing it only when a candidate assembled from recorded feedback wins an evaluation against the version in use.
 
 ## Observability and telemetry
 

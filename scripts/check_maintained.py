@@ -12,10 +12,11 @@ inclusion criteria actually being crossed: roughly twelve months with no real
 activity, judged by hand at review time. The final call stays human; this is
 the machine saying which entries the human has to look at.
 
-Keeping them apart is what lets the workflow gate two things separately: it
-files the review issue on either marker, and it restamps the README's
-verified-on date only when nothing has breached. Under one combined flag the
-restamp could never fire, because the 90-day band is never empty.
+Keeping them apart is what keeps the weekly report readable. The workflow
+posts every run's report to a standing review issue, and the reviewer has to
+see at a glance which entries need a decision now and which are only worth a
+look. Under one combined flag every run would read as a problem, because the
+90-day band is never empty.
 
 EXEMPTIONS below carries entries that fail the age heuristic by design: a
 reference essay or specification whose value doesn't depend on ongoing
@@ -160,8 +161,9 @@ def main() -> int:
         for name, owner, repo, reason in exempt:
             print(f"EXEMPT ({reason}): {name} -- https://github.com/{owner}/{repo}")
 
-    # Advisory only, both markers. Exit 0 regardless; the workflow step reads
-    # the markers and decides what to file and whether to restamp.
+    # Advisory only, both markers. Exit 0 regardless; the workflow step greps
+    # the markers into its outputs and posts the whole report to the standing
+    # review issue every run.
     return 0
 
 

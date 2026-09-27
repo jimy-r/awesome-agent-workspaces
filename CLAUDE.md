@@ -42,4 +42,4 @@ Do not submit this list to other lists, indexes, or directories. Do not open iss
 - Branch for changes; keep pull requests to one focused change.
 - Categories need at least two entries. A thinner one gets folded into its neighbour rather than left standing.
 - Entry format is `- [Name](url) - Description.` with a hyphen separator, a capitalised description, and a full stop. `awesome-lint` enforces this in CI.
-- Update the verification date in the README footer whenever entries are re-checked.
+- Re-checking entries writes nothing to the README. The weekly workflow posts every run's report, clean or not, to the standing review issue (label `maintenance`) and to the job summary.

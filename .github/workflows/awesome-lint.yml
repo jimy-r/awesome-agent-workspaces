@@ -38,4 +38,4 @@ jobs:
         # its GitHub API checks run unauthenticated and can hit rate limits.
         env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-        run: npx --yes awesome-lint
+        run: npx --yes awesome-lint@2.3.0

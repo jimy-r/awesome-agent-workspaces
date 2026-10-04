@@ -8,3 +8,4 @@ As of 2026-09-05 no third-party submission has been received; the table fills fr
 
 | Date | Entry | Reason |
 | --- | --- | --- |
+| 2026-10-04 | Reef | Capability tool: improving the agent is the purpose, and the versioned, evaluation-gated artifact is the safeguard around it (criterion 3). |

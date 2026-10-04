@@ -8,3 +8,4 @@ Entries dropped during initial curation predate this log.
 
 | Date | Entry | Reason |
 | --- | --- | --- |
+| 2026-10-04 | Reef | Capability tool: improving the agent is the purpose, and the versioned, evaluation-gated artifact is the safeguard around it (criterion 3). |

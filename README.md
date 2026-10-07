@@ -27,7 +27,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 
 ## Memory systems
 
-- [mem0](https://github.com/mem0ai/mem0) - Extracts and consolidates facts out of conversations so an agent carries a compact memory forward instead of a growing transcript.
+- [mem0](https://github.com/mem0ai/mem0) - Extracts facts from conversations in a single add-only pass and stores them in a vector index, scoped by user, agent or session.
 - [Graphiti](https://github.com/getzep/graphiti) - Builds temporal knowledge graphs that record when a fact became true and when it stopped being true, rather than overwriting it.
 - [Letta](https://github.com/letta-ai/letta-code) - Gives agents memory blocks they edit themselves, continuing the MemGPT line of work on paging state through a fixed context window.
 - [Hindsight](https://github.com/vectorize-io/hindsight) - Ships its agent memory alongside a public benchmark suite and a paper, so the retention claims can be checked rather than taken on trust.

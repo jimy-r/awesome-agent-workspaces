@@ -32,6 +32,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 - [Letta](https://github.com/letta-ai/letta-code) - Gives agents memory blocks they edit themselves, continuing the MemGPT line of work on paging state through a fixed context window.
 - [Hindsight](https://github.com/vectorize-io/hindsight) - Ships its agent memory alongside a public benchmark suite and a paper, so the retention claims can be checked rather than taken on trust.
 - [Basic Memory](https://github.com/basicmachines-co/basic-memory) - Keeps memory as plain Markdown files on disk that a person can read, edit and diff next to the agent that wrote them.
+- [OpenViking](https://github.com/volcengine/OpenViking) - Keeps an agent's memory, knowledge and skills in one virtual filesystem and generates abstract and overview tiers for each directory, so context can load at more than one level of detail.
 
 ## Context management
 

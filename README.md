@@ -36,6 +36,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 
 ## Context management
 
+- [Screenpipe](https://github.com/screenpipe/screenpipe) - Keeps locally captured screen text and audio transcripts searchable through MCP, so agents can retrieve work context from earlier sessions.
 - [LLMLingua](https://github.com/microsoft/LLMLingua) - Compresses prompts and KV-cache to fit more useful context into the same window, with the compression ratios measured rather than asserted.
 - [Claude Context](https://github.com/zilliztech/claude-context) - Indexes a codebase for semantic search over MCP so an agent retrieves the few relevant files instead of loading the tree.
 - [Continuous Claude](https://github.com/parcadei/Continuous-Claude-v3) - Uses hooks to hold working state in ledgers and handoff files, so a task survives compaction and isolated sub-agent context windows.

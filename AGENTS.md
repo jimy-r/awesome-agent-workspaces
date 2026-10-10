@@ -50,7 +50,7 @@ it there rather than closing a pull request silently.
 - **Pin third-party actions to a commit SHA** with the version as a trailing
   comment. A moving tag lets someone else change what runs under this repo's
   token, and the maintained-check job's token can write issues.
-- Entry descriptions are one sentence, sentence case, no marketing adjectives.
+- Entry descriptions are one line, sentence case, no marketing adjectives.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full mechanics and
 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for the participation rules.

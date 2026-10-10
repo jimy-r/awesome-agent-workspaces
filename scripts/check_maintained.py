@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Flag README entries whose upstream repo has gone quiet.
+"""Flag README entries whose upstream repo has gone quiet, been archived or moved.
 
 Two thresholds, reported as two distinct markers, because they answer two
 different questions.
@@ -18,12 +18,20 @@ see at a glance which entries need a decision now and which are only worth a
 look. Under one combined flag every run would read as a problem, because the
 90-day band is never empty.
 
+Two more markers come from the same API call, because a push date cannot see
+either case. ARCHIVED sits with BREACH: an archived repo keeps the push date
+it had, so the age check passes while the project is closed. MOVED sits with
+STALE: the API answers a renamed or transferred repo under its old path, so
+the entry still resolves while the list carries a path that is no longer the
+canonical one.
+
 EXEMPTIONS below carries entries that fail the age heuristic by design: a
 reference essay or specification whose value doesn't depend on ongoing
 commits, not a tool that rots without them. An exempted entry is never
 checked against the push-date thresholds and reports as EXEMPT, never as
-STALE or BREACH. It still has to clear CONTRIBUTING.md's other two criteria;
-this dict only carries the "maintained" one and records why.
+STALE or BREACH. It is still read for ARCHIVED, MOVED and UNREACHABLE, which
+say nothing about age. It still has to clear CONTRIBUTING.md's other two
+criteria; this dict only carries the "maintained" one and records why.
 
 Usage:
     python scripts/check_maintained.py            # human-readable report
@@ -55,7 +63,13 @@ EXEMPTIONS: dict[str, str] = {
     ),
 }
 
-ENTRY_RE = re.compile(r"^-\s+\[([^\]]+)\]\(https://github\.com/([^/]+)/([^/)]+)\)")
+# An entry is a list item whose link points at a GitHub repo. Anything after
+# owner/repo (a path into the tree, a fragment, a query) is allowed and
+# ignored, so an entry that deep-links into a repo is checked against that
+# repo instead of being skipped.
+ENTRY_RE = re.compile(
+    r"^-\s+\[([^\]]+)\]\(https://github\.com/([^/)\s]+)/([^/)\s#?]+)(?:[/#?][^)]*)?\)"
+)
 
 
 def find_entries() -> list[tuple[str, str, str]]:
@@ -68,16 +82,33 @@ def find_entries() -> list[tuple[str, str, str]]:
     return entries
 
 
-def pushed_at(owner: str, repo: str) -> str | None:
+def repo_state(owner: str, repo: str) -> dict | None:
+    """Return the repo's pushed_at, archived and full_name, or None.
+
+    One API call carries all three. None means the call failed or came back
+    without a push date, and the entry is reported as UNREACHABLE.
+    """
     result = subprocess.run(
-        ["gh", "api", f"repos/{owner}/{repo}", "--jq", ".pushed_at"],
+        [
+            "gh",
+            "api",
+            f"repos/{owner}/{repo}",
+            "--jq",
+            "{pushed_at, archived, full_name}",
+        ],
         capture_output=True,
         text=True,
         check=False,
     )
     if result.returncode != 0:
         return None
-    return result.stdout.strip() or None
+    try:
+        state = json.loads(result.stdout)
+    except ValueError:
+        return None
+    if not isinstance(state, dict) or not state.get("pushed_at"):
+        return None
+    return state
 
 
 def main() -> int:
@@ -90,18 +121,36 @@ def main() -> int:
     stale: list[tuple[str, str, str, int]] = []
     breached: list[tuple[str, str, str, int]] = []
     unreachable: list[str] = []
+    archived: list[tuple[str, str, str]] = []
+    moved: list[tuple[str, str, str, str]] = []
     exempt: list[tuple[str, str, str, str]] = []
+    # Two entries can point into one repo (its root and a page inside it), so
+    # each repo is asked for once.
+    states: dict[str, dict | None] = {}
 
     for name, owner, repo in entries:
-        reason = EXEMPTIONS.get(f"{owner}/{repo}")
+        slug = f"{owner}/{repo}"
+        reason = EXEMPTIONS.get(slug)
         if reason is not None:
             exempt.append((name, owner, repo, reason))
+        if slug.lower() not in states:
+            states[slug.lower()] = repo_state(owner, repo)
+        state = states[slug.lower()]
+        if state is None:
+            unreachable.append(f"{name} ({slug})")
             continue
-        ts = pushed_at(owner, repo)
-        if ts is None:
-            unreachable.append(f"{name} ({owner}/{repo})")
+        # GitHub paths are case-insensitive, so only a different path counts.
+        full_name = state.get("full_name") or slug
+        if full_name.lower() != slug.lower():
+            moved.append((name, owner, repo, full_name))
+        if state.get("archived"):
+            # An archived repo's push date is frozen, so its age says nothing
+            # the ARCHIVED marker has not already said.
+            archived.append((name, owner, repo))
             continue
-        pushed = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(
+        if reason is not None:
+            continue
+        pushed = datetime.strptime(state["pushed_at"], "%Y-%m-%dT%H:%M:%SZ").replace(
             tzinfo=timezone.utc
         )
         age_days = (now - pushed).days
@@ -111,6 +160,7 @@ def main() -> int:
             stale.append((name, owner, repo, age_days))
 
     checked = len(entries) - len(exempt)
+    bar_crossed = bool(breached or archived or unreachable)
 
     if args.json:
         print(
@@ -128,6 +178,13 @@ def main() -> int:
                         for n, o, r, d in breached
                     ],
                     "unreachable": unreachable,
+                    "archived": [
+                        {"name": n, "owner": o, "repo": r} for n, o, r in archived
+                    ],
+                    "moved": [
+                        {"name": n, "owner": o, "repo": r, "now": full}
+                        for n, o, r, full in moved
+                    ],
                     "exempt": [
                         {"name": n, "owner": o, "repo": r, "reason": reason}
                         for n, o, r, reason in exempt
@@ -136,21 +193,32 @@ def main() -> int:
             )
         )
     else:
-        if not stale and not breached and not unreachable:
+        if not bar_crossed and not stale and not moved:
             suffix = f" ({len(exempt)} exempt from the age check.)" if exempt else ""
             print(
                 f"All {checked} entries pushed within the last {STALE_DAYS} days.{suffix}"
             )
-        elif not breached and not unreachable:
+        elif not bar_crossed:
+            look = []
+            if stale:
+                look.append(
+                    f"{len(stale)} of {checked} are quieter than {STALE_DAYS} days "
+                    "and worth a look."
+                )
+            if moved:
+                look.append(f"{len(moved)} listed under a path that has moved.")
             print(
                 f"No entry has breached the {BREACH_DAYS}-day maintained bar. "
-                f"{len(stale)} of {checked} are quieter than {STALE_DAYS} days "
-                "and worth a look."
+                + " ".join(look)
             )
         for name, owner, repo, age_days in sorted(breached, key=lambda x: -x[3]):
             print(
                 f"BREACH ({age_days}d since last push, bar is {BREACH_DAYS}d): "
                 f"{name} -- https://github.com/{owner}/{repo}"
+            )
+        for name, owner, repo in archived:
+            print(
+                f"ARCHIVED (upstream is read-only): {name} -- https://github.com/{owner}/{repo}"
             )
         for u in unreachable:
             print(f"UNREACHABLE (api call failed): {u}")
@@ -158,10 +226,15 @@ def main() -> int:
             print(
                 f"STALE ({age_days}d since last push): {name} -- https://github.com/{owner}/{repo}"
             )
+        for name, owner, repo, full_name in moved:
+            print(
+                f"MOVED (now https://github.com/{full_name}): "
+                f"{name} -- https://github.com/{owner}/{repo}"
+            )
         for name, owner, repo, reason in exempt:
             print(f"EXEMPT ({reason}): {name} -- https://github.com/{owner}/{repo}")
 
-    # Advisory only, both markers. Exit 0 regardless; the workflow step greps
+    # Advisory only, every marker. Exit 0 regardless; the workflow step greps
     # the markers into its outputs and posts the whole report to the standing
     # review issue every run.
     return 0

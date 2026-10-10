@@ -1,9 +1,10 @@
 name: Maintained check
 
 # Mechanised watch on the README's "maintained" bar. The check reports two
-# markers: STALE at 90 days (early warning, worth a look) and BREACH at 365
-# days or UNREACHABLE (the bar itself crossed, judged by hand at review time).
-# See scripts/check_maintained.py for why they are separate.
+# classes of marker: STALE at 90 days or MOVED (early warning, worth a look),
+# and BREACH at 365 days, ARCHIVED or UNREACHABLE (the bar itself crossed,
+# judged by hand at review time). See scripts/check_maintained.py for why they
+# are separate.
 #
 # Every run's report -- clean or not -- refreshes the standing review issue's
 # body, and is also written to the job summary. Nothing is pushed back to the
@@ -31,18 +32,18 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Check each entry's last push date
+      - name: Check each entry's push date, archive flag and path
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 scripts/check_maintained.py | tee maintained-report.txt
-          if grep -qE "^(BREACH|UNREACHABLE)" maintained-report.txt; then
+          if grep -qE "^(BREACH|ARCHIVED|UNREACHABLE)" maintained-report.txt; then
             echo "found_breach=true" >> "$GITHUB_OUTPUT"
           else
             echo "found_breach=false" >> "$GITHUB_OUTPUT"
           fi
-          if grep -qE "^STALE" maintained-report.txt; then
+          if grep -qE "^(STALE|MOVED)" maintained-report.txt; then
             echo "found_stale=true" >> "$GITHUB_OUTPUT"
           else
             echo "found_stale=false" >> "$GITHUB_OUTPUT"

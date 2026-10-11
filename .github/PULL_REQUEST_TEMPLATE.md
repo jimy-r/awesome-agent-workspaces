@@ -9,7 +9,7 @@ request to split it. See CONTRIBUTING.md for the full bar.
 
 **URL:**
 
-**Category:** <!-- Memory systems / Context management / Evaluation and benchmarks / Hooks and guardrails / Orchestration and delegation / Skills and instruction management / Observability and telemetry / Security and permissions / Reference architectures and teardowns / Learning resources -->
+**Category:** <!-- Memory systems / Context management / Evaluation and benchmarks / Hooks and guardrails / Orchestration and delegation / Skills and instruction management / Observability and telemetry / Security and permissions / Reference architectures / Learning resources -->
 
 **What it uniquely solves (one line, plain prose):**
 

@@ -10,7 +10,7 @@ Most agent tooling chases capability. Smarter agents, faster agents, agents that
 
 **The bar.** Every entry clears three tests. It is *maintained*, meaning real activity within roughly the last twelve months. It is *documented*, meaning a reader can tell what it does, and how it differs from the entry above it, without cloning it. And it is genuinely about *workspace durability* rather than agent capability. Every entry earns its place. The list is deliberately small, and it will stay small. Rejected submissions are recorded in [REJECTIONS.md](REJECTIONS.md) with a reason, because the bar is the product.
 
-A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py)) reads every entry's last push date. It flags anything quieter than 90 days as a signal to review, well before that entry would cross the twelve-month bar above, and reports a breach separately once one actually does.
+A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py)) reads every entry's last push date. It flags anything quieter than 90 days as a signal to review, well before that entry would cross the twelve-month bar above, and reports a breach separately once one actually does. The same check reports an entry whose repo has been archived or has moved to a new path, because neither shows up in a push date.
 
 ## Contents
 

@@ -17,14 +17,15 @@ honest. Nothing is published from it and nothing runs on its own.
 
 ```bash
 npx awesome-lint                      # list format, what CI enforces
-python scripts/check_maintained.py    # each entry's last push date, read-only
+python scripts/check_maintained.py    # each entry's upstream repo, read-only
 ```
 
-`check_maintained.py` reports two markers. `STALE` at 90 days is early warning;
-`BREACH` at 365 days, and `UNREACHABLE`, mean the README's maintained bar has
-actually been crossed. The weekly workflow posts every run's report, clean or
-not, to one standing review issue and to the job summary, and never pushes to
-the repo. Adding an entry does not require running it.
+`check_maintained.py` reports two classes of marker. `STALE` at 90 days and
+`MOVED`, a repo that now answers under a different path, are early warning.
+`BREACH` at 365 days, `ARCHIVED` and `UNREACHABLE` mean the README's maintained
+bar has actually been crossed. The weekly workflow posts every run's report,
+clean or not, to one standing review issue and to the job summary, and never
+pushes to the repo. Adding an entry does not require running it.
 
 Link checking runs in CI against live URLs, so run it there rather than locally.
 
@@ -50,7 +51,7 @@ it there rather than closing a pull request silently.
 - **Pin third-party actions to a commit SHA** with the version as a trailing
   comment. A moving tag lets someone else change what runs under this repo's
   token, and the maintained-check job's token can write issues.
-- Entry descriptions are one sentence, sentence case, no marketing adjectives.
+- Entry descriptions are one line, sentence case, no marketing adjectives.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full mechanics and
 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for the participation rules.

@@ -67,6 +67,7 @@ A weekly CI check ([`scripts/check_maintained.py`](scripts/check_maintained.py))
 - [MulmoTerminal](https://github.com/receptron/mulmoterminal) - Browser grid of live Claude Code / Codex sessions started with one `npx` command. Each cell is a real PTY with a colour-coded status, tmux-backed persistence, and a git worktree per cell. For Claude Code, needs-you is shown separately from done, read from the CLI's own hooks.
 - [Orkas](https://github.com/Orkas-AI/Orkas) - Desktop app where one commander agent dispatches specialist agents under a bounded fan-out and four separate runaway guards, with a ledger of files touched and commands run that survives every compaction.
 - [Tale](https://github.com/tale-project/tale) - Reuses each project agent's sandbox across tasks, with task-scoped attachments and collected deliverables kept available for human review.
+- [TreeHarbor](https://github.com/ArtAndrew/TreeHarbor) - Keeps coding-agent patches tied to their starting Git commit and available for Git export after workspace cleanup.
 
 ## Skills and instruction management
 
